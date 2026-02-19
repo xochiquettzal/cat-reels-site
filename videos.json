@@ -1,8 +1,8 @@
 [
   {
     "id": 1,
-    "title": "First Reel Ã¢ÂÂ¨",
-    "caption": "Welcome to Kitty Reels! Ã°ÂÂÂ± Swipe up for more.",
+    "title": "First Reel ÃÂ¢ÃÂÃÂ¨",
+    "caption": "Welcome to Kitty Reels! ÃÂ°ÃÂÃÂÃÂ± Swipe up for more.",
     "src": "videos/sample1.mp4"
   },
   {
@@ -10,5 +10,11 @@
     "title": "yakuptv",
     "caption": "",
     "src": "videos/video.mp4"
+  },
+  {
+    "id": 3,
+    "title": "Bir hayaldir",
+    "caption": "",
+    "src": "videos/2026-02-17_16-54-31_utc.mp4"
   }
 ]
