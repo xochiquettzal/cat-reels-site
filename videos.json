@@ -1,8 +1,14 @@
 [
-    {
-        "id": 1,
-        "title": "First Reel ✨",
-        "caption": "Welcome to Kitty Reels! 🐱 Swipe up for more.",
-        "src": "videos/sample1.mp4"
-    }
+  {
+    "id": 1,
+    "title": "First Reel â¨",
+    "caption": "Welcome to Kitty Reels! ð± Swipe up for more.",
+    "src": "videos/sample1.mp4"
+  },
+  {
+    "id": 2,
+    "title": "yakuptv",
+    "caption": "",
+    "src": "videos/video.mp4"
+  }
 ]
