@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="description" content="A cozy cat-themed short video feed — watch cute reels in a soft pastel world 🐱" />
+  <meta name="theme-color" content="#ffd6e7" />
+  <title>🐱 Kitty Reels</title>
+
+  <!-- Favicon (inline SVG cat emoji) -->
+  <link rel="icon"
+    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐱</text></svg>" />
+
+  <!-- Google Fonts: Nunito (rounded, bubbly, readable) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+  <!-- Custom paw cursor applied via CSS -->
+
+  <!-- ===================== FLOATING CAT DECORATIONS (Desktop BG) ===================== -->
+  <div class="cat-bg-decorations" aria-hidden="true">
+    <div class="floating-cat cat-1">
+      <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="40" cy="50" rx="28" ry="24" fill="#ffd6e7" opacity="0.5" />
+        <polygon points="16,30 12,8 28,24" fill="#ffd6e7" opacity="0.5" />
+        <polygon points="64,30 68,8 52,24" fill="#ffd6e7" opacity="0.5" />
+        <circle cx="32" cy="46" r="3" fill="#d4a0b9" opacity="0.5" />
+        <circle cx="48" cy="46" r="3" fill="#d4a0b9" opacity="0.5" />
+        <ellipse cx="40" cy="52" rx="3" ry="2" fill="#e6b0c7" opacity="0.5" />
+      </svg>
+    </div>
+    <div class="floating-cat cat-2">
+      <svg viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="30" cy="38" rx="20" ry="17" fill="#e6dcff" opacity="0.4" />
+        <polygon points="13,24 10,6 22,18" fill="#e6dcff" opacity="0.4" />
+        <polygon points="47,24 50,6 38,18" fill="#e6dcff" opacity="0.4" />
+        <circle cx="24" cy="34" r="2.5" fill="#b8a0d4" opacity="0.4" />
+        <circle cx="36" cy="34" r="2.5" fill="#b8a0d4" opacity="0.4" />
+        <ellipse cx="30" cy="39" rx="2" ry="1.5" fill="#c4aedd" opacity="0.4" />
+      </svg>
+    </div>
+    <div class="floating-cat cat-3">
+      <svg viewBox="0 0 70 70" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="35" cy="44" rx="24" ry="20" fill="#ffe8d6" opacity="0.35" />
+        <polygon points="14,28 10,7 24,22" fill="#ffe8d6" opacity="0.35" />
+        <polygon points="56,28 60,7 46,22" fill="#ffe8d6" opacity="0.35" />
+        <circle cx="28" cy="40" r="2.8" fill="#d4b09e" opacity="0.35" />
+        <circle cx="42" cy="40" r="2.8" fill="#d4b09e" opacity="0.35" />
+      </svg>
+    </div>
+    <div class="floating-cat cat-4">
+      <svg viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="25" cy="32" rx="16" ry="13" fill="#ffd6e7" opacity="0.3" />
+        <polygon points="11,20 9,5 18,16" fill="#ffd6e7" opacity="0.3" />
+        <polygon points="39,20 41,5 32,16" fill="#ffd6e7" opacity="0.3" />
+        <circle cx="20" cy="29" r="2" fill="#d4a0b9" opacity="0.3" />
+        <circle cx="30" cy="29" r="2" fill="#d4a0b9" opacity="0.3" />
+      </svg>
+    </div>
+  </div>
+
+  <!-- ===================== PHONE FRAME (Desktop wrapper) ===================== -->
+  <div class="phone-frame">
+
+    <!-- ===================== HEADER ===================== -->
+    <header class="app-header" role="banner">
+      <div class="header-inner">
+        <div class="logo" aria-label="Kitty Reels">
+          <svg class="logo-cat" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <ellipse cx="18" cy="22" rx="13" ry="11" fill="#ffd6e7" />
+            <polygon points="7,14 4,2 13,10" fill="#e6dcff" />
+            <polygon points="29,14 32,2 23,10" fill="#e6dcff" />
+            <circle cx="14" cy="20" r="2" fill="#555" />
+            <circle cx="22" cy="20" r="2" fill="#555" />
+            <ellipse cx="18" cy="23" rx="2" ry="1.2" fill="#ffb5c5" />
+            <line x1="5" y1="22" x2="13" y2="21" stroke="#ddd" stroke-width="0.6" />
+            <line x1="5" y1="24" x2="13" y2="23" stroke="#ddd" stroke-width="0.6" />
+            <line x1="31" y1="22" x2="23" y2="21" stroke="#ddd" stroke-width="0.6" />
+            <line x1="31" y1="24" x2="23" y2="23" stroke="#ddd" stroke-width="0.6" />
+          </svg>
+          <span class="logo-text">Kitty Reels</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- ===================== MAIN REEL FEED ===================== -->
+    <main id="reelFeed" class="reel-feed" role="main" aria-label="Video feed">
+      <!-- Reels are injected here by script.js -->
+    </main>
+
+    <!-- ===================== SOUND INDICATOR ===================== -->
+    <div id="soundIndicator" class="sound-indicator" aria-live="polite" aria-hidden="true">
+      <svg class="sound-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polygon points="11,5 6,9 2,9 2,15 6,15 11,19" fill="currentColor" />
+        <path d="M19.07 4.93a10 10 0 0 1 0 14.14" class="sound-wave-1" />
+        <path d="M15.54 8.46a5 5 0 0 1 0 7.07" class="sound-wave-2" />
+      </svg>
+    </div>
+
+    <div id="muteIndicator" class="sound-indicator" aria-live="polite" aria-hidden="true">
+      <svg class="sound-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polygon points="11,5 6,9 2,9 2,15 6,15 11,19" fill="currentColor" />
+        <line x1="23" y1="9" x2="17" y2="15" />
+        <line x1="17" y1="9" x2="23" y2="15" />
+      </svg>
+    </div>
+
+    <!-- ===================== BOTTOM NAV ===================== -->
+    <nav class="bottom-nav" role="navigation" aria-label="Main navigation">
+      <button class="nav-btn active" data-page="home" aria-label="Home" aria-current="page">
+        <!-- Home / paw icon -->
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M12 3L2 12h3v8h6v-6h2v6h6v-8h3L12 3z" />
+        </svg>
+        <span class="nav-label">Home</span>
+      </button>
+      <button class="nav-btn" data-page="cats" aria-label="Cats gallery">
+        <!-- Cat face icon -->
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path
+            d="M12,2 C6.48,2 2,6.48 2,12 C2,17.52 6.48,22 12,22 C17.52,22 22,17.52 22,12 C22,6.48 17.52,2 12,2z M8,1 L5,6 L8,6z M16,1 L19,6 L16,6z" />
+          <circle cx="9" cy="13" r="1.5" />
+          <circle cx="15" cy="13" r="1.5" />
+          <ellipse cx="12" cy="16" rx="2" ry="1" />
+        </svg>
+        <span class="nav-label">Cats</span>
+      </button>
+      <button class="nav-btn" data-page="info" aria-label="Information">
+        <!-- Info icon -->
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2" />
+          <line x1="12" y1="16" x2="12" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+          <circle cx="12" cy="8" r="1" />
+        </svg>
+        <span class="nav-label">Info</span>
+      </button>
+      <button class="nav-btn" data-page="admin" aria-label="Admin panel">
+        <!-- Gear / settings icon -->
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path
+            d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.07-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.74,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.07,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.44-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.47-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z" />
+        </svg>
+        <span class="nav-label">Admin</span>
+      </button>
+    </nav>
+
+    <!-- ===================== PAGES (hidden by default) ===================== -->
+    <!-- Cats Page -->
+    <section id="pageCats" class="page-overlay hidden" role="region" aria-label="Cats gallery">
+      <div class="page-content">
+        <button class="page-close-btn" aria-label="Close">&times;</button>
+        <h2>🐱 Cats Gallery</h2>
+        <p class="page-desc">Coming soon! A collection of the cutest cat moments.</p>
+        <div class="cats-grid">
+          <div class="cat-card">
+            <div class="cat-card-icon">😺</div>
+            <p>Whiskers</p>
+          </div>
+          <div class="cat-card">
+            <div class="cat-card-icon">😻</div>
+            <p>Mittens</p>
+          </div>
+          <div class="cat-card">
+            <div class="cat-card-icon">🙀</div>
+            <p>Shadow</p>
+          </div>
+          <div class="cat-card">
+            <div class="cat-card-icon">😸</div>
+            <p>Biscuit</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Info Page -->
+    <section id="pageInfo" class="page-overlay hidden" role="region" aria-label="Info page">
+      <div class="page-content">
+        <button class="page-close-btn" aria-label="Close">&times;</button>
+        <h2>ℹ️ About Kitty Reels</h2>
+        <p class="page-desc">
+          A cozy little corner of the internet where cute videos live.
+          Built with love, pastel colors, and lots of purring. 🐾
+        </p>
+        <div class="info-details">
+          <div class="info-item">
+            <span class="info-emoji">🎬</span>
+            <span>Swipe up/down to browse reels</span>
+          </div>
+          <div class="info-item">
+            <span class="info-emoji">🔊</span>
+            <span>Tap video to toggle sound</span>
+          </div>
+          <div class="info-item">
+            <span class="info-emoji">❤️</span>
+            <span>Double-tap to like</span>
+          </div>
+          <div class="info-item">
+            <span class="info-emoji">⌨️</span>
+            <span>Use ↑↓ arrow keys on desktop</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Admin Page -->
+    <section id="pageAdmin" class="page-overlay hidden" role="region" aria-label="Admin panel">
+      <div class="page-content admin-content">
+        <button class="page-close-btn" aria-label="Close">&times;</button>
+        <h2>🔧 Admin Panel</h2>
+        <p class="page-desc">Upload videos directly to your GitHub repo.</p>
+
+        <!-- GitHub Token Setup -->
+        <div class="admin-section">
+          <h3>🔑 GitHub Settings</h3>
+          <div class="form-group">
+            <label for="ghToken">Personal Access Token</label>
+            <input type="password" id="ghToken" placeholder="ghp_xxxxxxxxxxxx" autocomplete="off" />
+          </div>
+          <div class="form-group">
+            <label for="ghRepo">Repository (owner/repo)</label>
+            <input type="text" id="ghRepo" placeholder="username/champain" />
+          </div>
+          <div class="form-group">
+            <label for="ghBranch">Branch</label>
+            <input type="text" id="ghBranch" placeholder="main" value="main" />
+          </div>
+          <button id="btnSaveGH" class="btn-primary">
+            <span class="btn-paw">🐾</span> Save Settings
+          </button>
+          <div id="ghStatus" class="status-msg"></div>
+        </div>
+
+        <!-- Upload Video -->
+        <div class="admin-section">
+          <h3>📹 Add New Video</h3>
+          <div class="form-group">
+            <label for="videoFile">Select Video File</label>
+            <input type="file" id="videoFile" accept="video/mp4,video/webm" />
+          </div>
+          <div class="form-group checkbox-group">
+            <label class="checkbox-label">
+              <input type="checkbox" id="compressVideo" checked />
+              <span>Compress before upload (reduces file size)</span>
+            </label>
+          </div>
+          <div class="form-group">
+            <label for="videoTitle">Title</label>
+            <input type="text" id="videoTitle" placeholder="Cute Cat Moment ✨" />
+          </div>
+          <div class="form-group">
+            <label for="videoCaption">Caption</label>
+            <input type="text" id="videoCaption" placeholder="Just vibing 🐱" />
+          </div>
+          <div id="uploadProgress" class="progress-bar hidden">
+            <div class="progress-fill"></div>
+            <span class="progress-text">Uploading...</span>
+          </div>
+          <button id="btnUpload" class="btn-primary">
+            <span class="btn-paw">🐾</span> Upload to GitHub
+          </button>
+          <div id="uploadStatus" class="status-msg"></div>
+        </div>
+
+        <!-- Current Videos List -->
+        <div class="admin-section">
+          <h3>📋 Current Videos</h3>
+          <div id="videosList" class="videos-list">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div><!-- /.phone-frame -->
+
+  <script src="script.js"></script>
+</body>
+
+</html>
