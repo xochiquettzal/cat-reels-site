@@ -2,7 +2,7 @@ import instaloader
 
 L = instaloader.Instaloader()
 
-url = "https://www.instagram.com/reels/DUv2MTlCN4w/"
+url = "https://www.instagram.com/reels/DU3c_csjdXo/"
 
 shortcode = url.split("/")[-2]
 
