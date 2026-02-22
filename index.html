@@ -238,10 +238,10 @@
 
         <!-- Upload Video -->
         <div class="admin-section">
-          <h3>📹 Add New Video</h3>
+          <h3>📹 Add New Video(s)</h3>
           <div class="form-group">
-            <label for="videoFile">Select Video File</label>
-            <input type="file" id="videoFile" accept="video/mp4,video/webm" />
+            <label for="videoFile">Select Video File(s)</label>
+            <input type="file" id="videoFile" accept="video/mp4,video/webm" multiple />
           </div>
           <div class="form-group checkbox-group">
             <label class="checkbox-label">
@@ -249,13 +249,15 @@
               <span>Compress before upload (reduces file size)</span>
             </label>
           </div>
-          <div class="form-group">
-            <label for="videoTitle">Title</label>
-            <input type="text" id="videoTitle" placeholder="Cute Cat Moment ✨" />
-          </div>
-          <div class="form-group">
-            <label for="videoCaption">Caption</label>
-            <input type="text" id="videoCaption" placeholder="Just vibing 🐱" />
+          <div id="singleVideoFields">
+            <div class="form-group">
+              <label for="videoTitle">Title</label>
+              <input type="text" id="videoTitle" placeholder="Cute Cat Moment ✨" />
+            </div>
+            <div class="form-group">
+              <label for="videoCaption">Caption</label>
+              <input type="text" id="videoCaption" placeholder="Just vibing 🐱" />
+            </div>
           </div>
           <div id="uploadProgress" class="progress-bar hidden">
             <div class="progress-fill"></div>
@@ -269,7 +271,12 @@
 
         <!-- Current Videos List -->
         <div class="admin-section">
-          <h3>📋 Current Videos</h3>
+          <div class="admin-section-header">
+            <h3>📋 Current Videos</h3>
+            <button id="btnBulkDelete" class="btn-secondary hidden">
+              🗑️ Delete Selected
+            </button>
+          </div>
           <div id="videosList" class="videos-list">
             <!-- Populated by JS -->
           </div>

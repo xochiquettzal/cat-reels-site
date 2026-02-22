@@ -535,6 +535,17 @@ async function handleAdminLogin() {
 function setupAdminPanel() {
   document.getElementById('btnSaveGH').addEventListener('click', saveGHSettings);
   document.getElementById('btnUpload').addEventListener('click', uploadVideo);
+  document.getElementById('btnBulkDelete').addEventListener('click', handleBulkDelete);
+
+  // Show/Hide title/caption based on file count
+  document.getElementById('videoFile').addEventListener('change', (e) => {
+    const fields = document.getElementById('singleVideoFields');
+    if (e.target.files.length > 1) {
+      fields.classList.add('hidden');
+    } else {
+      fields.classList.remove('hidden');
+    }
+  });
 }
 
 function loadGHSettings() {
@@ -557,27 +568,22 @@ function saveGHSettings() {
 
 async function uploadVideo() {
   const fileInput = document.getElementById('videoFile');
-  const title = document.getElementById('videoTitle').value.trim();
-  const caption = document.getElementById('videoCaption').value.trim();
+  const singleTitle = document.getElementById('videoTitle').value.trim();
+  const singleCaption = document.getElementById('videoCaption').value.trim();
+  const files = Array.from(fileInput.files);
 
-  // Validate
   if (!state.ghToken || !state.ghRepo) {
     showStatus('uploadStatus', '❌ Set GitHub settings first', 'error');
     return;
   }
-  if (!fileInput.files.length) {
-    showStatus('uploadStatus', '❌ Select a video file', 'error');
+  if (!files.length) {
+    showStatus('uploadStatus', '❌ Select video file(s)', 'error');
     return;
   }
-  if (!title) {
+  if (files.length === 1 && !singleTitle) {
     showStatus('uploadStatus', '❌ Enter a title', 'error');
     return;
   }
-
-  const file = fileInput.files[0];
-  const compress = document.getElementById('compressVideo').checked;
-  const fileName = sanitizeFileName(file.name);
-  const filePath = `videos/${fileName}`;
 
   const btn = document.getElementById('btnUpload');
   const progressBar = document.getElementById('uploadProgress');
@@ -586,82 +592,107 @@ async function uploadVideo() {
 
   btn.disabled = true;
   progressBar.classList.remove('hidden');
-  progressFill.style.width = '5%';
-  progressText.textContent = 'Preparing...';
+  progressFill.style.width = '0%';
+  progressText.textContent = 'Starting...';
   showStatus('uploadStatus', '', '');
 
   try {
-    let base64Content;
-
-    if (compress) {
-      // Step 1a: Compress video via Canvas + MediaRecorder
-      progressText.textContent = 'Compressing video...';
-      progressFill.style.width = '10%';
-      const compressedBlob = await compressVideo(file, (progress) => {
-        progressFill.style.width = `${10 + progress * 20}%`;
-      });
-      base64Content = await blobToBase64(compressedBlob);
-      const savedPct = Math.round((1 - compressedBlob.size / file.size) * 100);
-      showStatus('uploadStatus', `📦 Compressed: ${formatBytes(file.size)} → ${formatBytes(compressedBlob.size)} (${savedPct}% saved)`, 'info');
-    } else {
-      // Step 1b: Read file directly
-      progressText.textContent = 'Reading file...';
-      base64Content = await fileToBase64(file);
-    }
-
-    progressFill.style.width = '35%';
-    progressText.textContent = 'Uploading video...';
-
-    // Step 2: Upload video file via GitHub API
-    await githubCreateOrUpdate(filePath, base64Content, `Add video: ${fileName}`);
-    progressFill.style.width = '60%';
-    progressText.textContent = 'Updating videos.json...';
-
-    // Step 3: Read current videos.json
+    const treeItems = [];
+    const compress = document.getElementById('compressVideo').checked;
+    
+    // Step 1: Read/Compress current videos.json
     let currentVideos = [];
     try {
       const jsonData = await githubGetFile('videos.json');
-      currentVideos = JSON.parse(atob(jsonData.content.replace(/\n/g, '')));
+      currentVideos = JSON.parse(decodeURIComponent(escape(atob(jsonData.content.replace(/\n/g, '')))));
     } catch (e) {
       currentVideos = [];
     }
 
-    // Step 4: Add new video entry
-    const newId = currentVideos.length > 0
-      ? Math.max(...currentVideos.map(v => v.id)) + 1
-      : 1;
+    let nextId = currentVideos.length > 0 ? Math.max(...currentVideos.map(v => v.id)) + 1 : 1;
 
-    currentVideos.push({
-      id: newId,
-      title: title,
-      caption: caption || '',
-      src: filePath,
+    // Step 2: Process each video file
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      const stepBase = (i / files.length) * 80;
+      const stepSize = 80 / files.length;
+
+      progressText.textContent = `Processing ${i + 1}/${files.length}: ${file.name}`;
+      progressFill.style.width = `${stepBase}%`;
+
+      let base64Content;
+      if (compress) {
+        const compressedBlob = await compressVideo(file, (p) => {
+          progressFill.style.width = `${stepBase + (p * stepSize * 0.7)}%`;
+        });
+        base64Content = await blobToBase64(compressedBlob);
+      } else {
+        base64Content = await fileToBase64(file);
+      }
+
+      const fileName = sanitizeFileName(file.name);
+      const filePath = `videos/${fileName}`;
+      
+      // Create blob on GitHub
+      const blobData = await githubCreateBlob(base64Content);
+      
+      treeItems.push({
+        path: filePath,
+        mode: '100644',
+        type: 'blob',
+        sha: blobData.sha
+      });
+
+      // Update metadata
+      currentVideos.push({
+        id: nextId++,
+        title: files.length === 1 ? singleTitle : file.name.replace(/\.[^/.]+$/, ""),
+        caption: files.length === 1 ? singleCaption : '',
+        src: filePath
+      });
+
+      progressFill.style.width = `${stepBase + stepSize}%`;
+    }
+
+    // Step 3: Create blob for updated videos.json
+    progressText.textContent = 'Updating metadata...';
+    const jsonStr = JSON.stringify(currentVideos, null, 2) + '\n';
+    const jsonBase64 = btoa(unescape(encodeURIComponent(jsonStr)));
+    const jsonBlob = await githubCreateBlob(jsonBase64);
+    
+    treeItems.push({
+      path: 'videos.json',
+      mode: '100644',
+      type: 'blob',
+      sha: jsonBlob.sha
     });
 
-    // Step 5: Update videos.json
-    const jsonContent = btoa(unescape(encodeURIComponent(
-      JSON.stringify(currentVideos, null, 2) + '\n'
-    )));
-    await githubCreateOrUpdate('videos.json', jsonContent, `Add video metadata: ${title}`);
+    // Step 4: Create Tree -> Commit -> Update Ref
+    progressText.textContent = 'Committing changes...';
+    progressFill.style.width = '90%';
+    
+    const baseTreeSha = await githubGetLatestCommitSha();
+    const newTree = await githubCreateTree(baseTreeSha, treeItems);
+    const newCommit = await githubCreateCommit(`Add ${files.length} video(s)`, newTree.sha, baseTreeSha);
+    await githubUpdateRef(newCommit.sha);
 
     progressFill.style.width = '100%';
     progressText.textContent = 'Done!';
-    showStatus('uploadStatus', '✅ Video uploaded! Site will update in ~2 min.', 'success');
+    showStatus('uploadStatus', `✅ ${files.length} video(s) uploaded in one commit!`, 'success');
 
-    // Clear form
+    // Reset form
     fileInput.value = '';
     document.getElementById('videoTitle').value = '';
     document.getElementById('videoCaption').value = '';
+    document.getElementById('singleVideoFields').classList.remove('hidden');
 
     // Refresh local state
     state.videos = currentVideos;
     renderFeed();
-    setupIntersectionObserver();
     renderAdminVideosList();
 
     setTimeout(() => {
       progressBar.classList.add('hidden');
-      progressFill.style.width = '0%';
     }, 2000);
 
   } catch (err) {
@@ -671,6 +702,84 @@ async function uploadVideo() {
   } finally {
     btn.disabled = false;
   }
+}
+
+/* ── GitHub Git Data API Helpers ── */
+
+async function githubCreateBlob(contentBase64) {
+  const url = `https://api.github.com/repos/${state.ghRepo}/git/blobs`;
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Authorization': `token ${state.ghToken}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      content: contentBase64,
+      encoding: 'base64'
+    })
+  });
+  if (!res.ok) throw new Error('Failed to create blob');
+  return await res.json();
+}
+
+async function githubGetLatestCommitSha() {
+  const url = `https://api.github.com/repos/${state.ghRepo}/git/refs/heads/${state.ghBranch}`;
+  const res = await fetch(url, {
+    headers: { 'Authorization': `token ${state.ghToken}` }
+  });
+  if (!res.ok) throw new Error('Failed to get branch ref');
+  const data = await res.json();
+  return data.object.sha;
+}
+
+async function githubCreateTree(baseTreeSha, treeItems) {
+  const url = `https://api.github.com/repos/${state.ghRepo}/git/trees`;
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Authorization': `token ${state.ghToken}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      base_tree: baseTreeSha,
+      tree: treeItems
+    })
+  });
+  if (!res.ok) throw new Error('Failed to create tree');
+  return await res.json();
+}
+
+async function githubCreateCommit(message, treeSha, parentSha) {
+  const url = `https://api.github.com/repos/${state.ghRepo}/git/commits`;
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Authorization': `token ${state.ghToken}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      message: message,
+      tree: treeSha,
+      parents: [parentSha]
+    })
+  });
+  if (!res.ok) throw new Error('Failed to create commit');
+  return await res.json();
+}
+
+async function githubUpdateRef(commitSha) {
+  const url = `https://api.github.com/repos/${state.ghRepo}/git/refs/heads/${state.ghBranch}`;
+  const res = await fetch(url, {
+    method: 'PATCH',
+    headers: {
+      'Authorization': `token ${state.ghToken}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ sha: commitSha })
+  });
+  if (!res.ok) throw new Error('Failed to update branch reference');
+  return await res.json();
 }
 
 /* ── GitHub API Helpers ── */
@@ -756,18 +865,36 @@ function renderAdminVideosList() {
 
   if (state.videos.length === 0) {
     list.innerHTML = '<p style="color: #999; font-size: 0.85rem; text-align: center;">No videos added yet.</p>';
+    document.getElementById('btnBulkDelete').classList.add('hidden');
     return;
   }
 
   list.innerHTML = state.videos.map((v, i) => `
     <div class="video-list-item">
+      <input type="checkbox" class="video-list-select" data-id="${v.id}" />
       <div class="video-list-num">${i + 1}</div>
-      <div class="video-list-title">${escapeHtml(v.title)}</div>
+      <div class="video-list-title" title="${escapeHtml(v.title)}">${escapeHtml(v.title)}</div>
       <button class="video-list-delete" data-id="${v.id}" aria-label="Delete ${v.title}" title="Delete">🗑️</button>
     </div>
   `).join('');
 
-  // Delete handlers
+  // Bulk delete button visibility
+  const updateBulkDeleteVisibility = () => {
+    const checked = list.querySelectorAll('.video-list-select:checked').length;
+    const btn = document.getElementById('btnBulkDelete');
+    if (checked > 0) {
+      btn.classList.remove('hidden');
+      btn.textContent = `🗑️ Delete Selected (${checked})`;
+    } else {
+      btn.classList.add('hidden');
+    }
+  };
+
+  list.querySelectorAll('.video-list-select').forEach(cb => {
+    cb.addEventListener('change', updateBulkDeleteVisibility);
+  });
+
+  // Single delete handlers
   list.querySelectorAll('.video-list-delete').forEach(btn => {
     btn.addEventListener('click', async () => {
       const id = parseInt(btn.dataset.id);
@@ -776,37 +903,97 @@ function renderAdminVideosList() {
 
       if (!confirm(`Delete "${video.title}"?`)) return;
 
-      if (state.ghToken && state.ghRepo) {
-        try {
-          showStatus('uploadStatus', '⏳ Deleting...', 'info');
-
-          // Delete video file from GitHub
-          try {
-            await githubDeleteFile(video.src, `Delete video: ${video.title}`);
-          } catch (e) {
-            console.warn('Could not delete video file:', e);
-          }
-
-          // Update videos.json
-          const updated = state.videos.filter(v => v.id !== id);
-          const jsonContent = btoa(unescape(encodeURIComponent(
-            JSON.stringify(updated, null, 2) + '\n'
-          )));
-          await githubCreateOrUpdate('videos.json', jsonContent, `Remove video: ${video.title}`);
-
-          state.videos = updated;
-          renderFeed();
-          setupIntersectionObserver();
-          renderAdminVideosList();
-          showStatus('uploadStatus', '✅ Video deleted!', 'success');
-        } catch (err) {
-          showStatus('uploadStatus', `❌ ${err.message}`, 'error');
-        }
-      } else {
+      if (!state.ghToken || !state.ghRepo) {
         showStatus('uploadStatus', '❌ Set GitHub settings to delete remotely', 'error');
+        return;
+      }
+
+      try {
+        showStatus('uploadStatus', '⏳ Deleting...', 'info');
+        
+        // Single delete using same atomic logic for consistency
+        await performAtomicDelete([id]);
+        
+        showStatus('uploadStatus', '✅ Video deleted!', 'success');
+      } catch (err) {
+        showStatus('uploadStatus', `❌ ${err.message}`, 'error');
       }
     });
   });
+}
+
+async function handleBulkDelete() {
+  const selectedCbs = document.querySelectorAll('.video-list-select:checked');
+  const ids = Array.from(selectedCbs).map(cb => parseInt(cb.dataset.id));
+  
+  if (ids.length === 0) return;
+  if (!confirm(`Are you sure you want to delete ${ids.length} videos?`)) return;
+
+  try {
+    showStatus('uploadStatus', '⏳ Processing bulk delete...', 'info');
+    await performAtomicDelete(ids);
+    showStatus('uploadStatus', `✅ ${ids.length} video(s) deleted!`, 'success');
+  } catch (err) {
+    showStatus('uploadStatus', `❌ ${err.message}`, 'error');
+  }
+}
+
+async function performAtomicDelete(idsToDelete) {
+  const treeItems = [];
+  const videosToRemove = state.videos.filter(v => idsToDelete.includes(v.id));
+  const updatedVideos = state.videos.filter(v => !idsToDelete.includes(v.id));
+
+  // 1. Mark files for deletion in the tree
+  // In Git Trees, to delete a file you simply don't include it in the new tree if it's based on an old tree,
+  // OR you can explicitly set SHA to null if using the Tree API without a base_tree.
+  // BUT the easiest way with base_tree is to NOT include the path.
+  // HOWEVER, githubCreateTree with base_tree ADDS/REPLACES. It doesn't remove unless we manually reconstruct.
+  
+  // So we'll use a different approach: 
+  // We'll get the FULL current tree, remove the items, and create a NEW tree without a base_tree.
+  // Actually, for simplicity and safety, we will just update videos.json and leave the files in the repo if they are many,
+  // OR we use the "delete" method for each file then update JSON.
+  // For "atomic" delete of both file & metadata, we NEED the Tree API.
+  
+  const baseSha = await githubGetLatestCommitSha();
+  
+  // Get full tree to know what to REMOVE
+  const treeUrl = `https://api.github.com/repos/${state.ghRepo}/git/trees/${baseSha}?recursive=1`;
+  const treeRes = await fetch(treeUrl, { headers: { 'Authorization': `token ${state.ghToken}` } });
+  const fullTree = await treeRes.json();
+  
+  const pathsToDelete = videosToRemove.map(v => v.src);
+  
+  // Filter out the deleted files and the old videos.json
+  const newTreeItems = fullTree.tree
+    .filter(item => item.type === 'blob' && !pathsToDelete.includes(item.path) && item.path !== 'videos.json')
+    .map(item => ({
+      path: item.path,
+      mode: item.mode,
+      type: item.type,
+      sha: item.sha
+    }));
+
+  // Add the updated videos.json
+  const jsonStr = JSON.stringify(updatedVideos, null, 2) + '\n';
+  const jsonBase64 = btoa(unescape(encodeURIComponent(jsonStr)));
+  const jsonBlob = await githubCreateBlob(jsonBase64);
+  
+  newTreeItems.push({
+    path: 'videos.json',
+    mode: '100644',
+    type: 'blob',
+    sha: jsonBlob.sha
+  });
+
+  const newTree = await githubCreateTree(null, newTreeItems); // No base_tree, we provided full content
+  const newCommit = await githubCreateCommit(`Delete ${idsToDelete.length} video(s)`, newTree.sha, baseSha);
+  await githubUpdateRef(newCommit.sha);
+
+  // Update local state
+  state.videos = updatedVideos;
+  renderFeed();
+  renderAdminVideosList();
 }
 
 /* =====================================================================
